@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import pandas as pd
 from functools import wraps
+import streamlit as st
 
 app = Flask(__name__)
 app.secret_key = "elite_academia_pro_max_2026"
@@ -142,4 +143,5 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
+
     app.run(debug=True)
