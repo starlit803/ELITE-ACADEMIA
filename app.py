@@ -5,17 +5,17 @@ import os
 import pandas as pd
 from functools import wraps
 
-
 app = Flask(__name__)
 app.secret_key = "elite_academia_pro_max_2026"
 
-# Database Configuration
+# --- Database Configuration ---
+# Railway par database path sahi rakhne ke liye
 current_dir = os.path.dirname(os.path.abspath(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(current_dir, 'students.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# Models
+# --- Models ---
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
@@ -33,7 +33,7 @@ class Student(db.Model):
 with app.app_context():
     db.create_all()
 
-# Auth Protection
+# --- Auth Protection ---
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -44,7 +44,8 @@ def login_required(f):
 
 # --- ROUTES ---
 @app.route('/')
-def home(): return redirect(url_for('login'))
+def home(): 
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -134,7 +135,8 @@ def upload_file():
                 db.session.add(new_s)
             db.session.commit()
             flash("Data Imported Successfully!", "success")
-        except: flash("File Format Error! Check Columns.", "error")
+        except: 
+            flash("File Format Error! Check Columns.", "error")
     return redirect(url_for('dashboard'))
 
 @app.route('/logout')
@@ -142,7 +144,8 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# --- Railway/Production Port Binding ---
 if __name__ == '__main__':
-
-    app.run(debug=True)
-
+    # Railway variable port use karega, agar local hai toh 5000
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
