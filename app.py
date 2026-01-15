@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = "elite_academia_pro_max_2026"
 
 # --- Database Configuration ---
-# Railway par database path sahi rakhne ke liye
+# Railway par database path sahi rakhne ke liye base directory ka use kiya hai
 current_dir = os.path.dirname(os.path.abspath(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(current_dir, 'students.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -30,10 +30,11 @@ class Student(db.Model):
     department = db.Column(db.String(100), nullable=False)
     cgpa = db.Column(db.Float, nullable=False)
 
+# Database table create karne ke liye
 with app.app_context():
     db.create_all()
 
-# --- Auth Protection ---
+# --- Auth Protection Wrapper ---
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -43,6 +44,7 @@ def login_required(f):
     return decorated_function
 
 # --- ROUTES ---
+
 @app.route('/')
 def home(): 
     return redirect(url_for('login'))
@@ -69,7 +71,8 @@ def register():
             db.session.commit()
             flash("Account Created Successfully!", "success")
             return redirect(url_for('login'))
-        except:
+        except Exception:
+            db.session.rollback()
             flash("Username already exists!", "error")
     return render_template('register.html')
 
@@ -85,17 +88,20 @@ def add_student():
     if request.method == 'POST':
         try:
             new_s = Student(
-                student_id=request.form.get('student_id'), name=request.form.get('name'),
-                email=request.form.get('email'), phone=request.form.get('phone'),
-                department=request.form.get('department'), cgpa=float(request.form.get('cgpa'))
+                student_id=request.form.get('student_id'), 
+                name=request.form.get('name'),
+                email=request.form.get('email'), 
+                phone=request.form.get('phone'),
+                department=request.form.get('department'), 
+                cgpa=float(request.form.get('cgpa'))
             )
             db.session.add(new_s)
             db.session.commit()
             flash("Student Added!", "success")
             return redirect(url_for('dashboard'))
-        except:
+        except Exception:
             db.session.rollback()
-            flash("Error: Duplicate ID", "error")
+            flash("Error: Duplicate ID or Invalid Data", "error")
     return render_template('add_student.html')
 
 @app.route('/edit_student/<int:id>', methods=['GET', 'POST'])
@@ -130,13 +136,20 @@ def upload_file():
         try:
             df = pd.read_csv(file) if file.filename.endswith('.csv') else pd.read_excel(file)
             for _, row in df.iterrows():
-                new_s = Student(student_id=str(row['ID']), name=row['Name'], email=row['Email'],
-                                phone=str(row['Phone']), department=row['Dept'], cgpa=float(row['GPA']))
+                new_s = Student(
+                    student_id=str(row['ID']), 
+                    name=row['Name'], 
+                    email=row['Email'],
+                    phone=str(row['Phone']), 
+                    department=row['Dept'], 
+                    cgpa=float(row['GPA'])
+                )
                 db.session.add(new_s)
             db.session.commit()
             flash("Data Imported Successfully!", "success")
-        except: 
-            flash("File Format Error! Check Columns.", "error")
+        except Exception: 
+            db.session.rollback()
+            flash("File Format Error! Check Columns (ID, Name, Email, Phone, Dept, GPA).", "error")
     return redirect(url_for('dashboard'))
 
 @app.route('/logout')
@@ -146,6 +159,7 @@ def logout():
 
 # --- Railway/Production Port Binding ---
 if __name__ == '__main__':
-    # Railway variable port use karega, agar local hai toh 5000
+    # Railway variable port use karega, local system par 5000 use karega
     port = int(os.environ.get("PORT", 5000))
+    # host='0.0.0.0' cloud deployment ke liye lazmi hai
     app.run(host='0.0.0.0', port=port)
