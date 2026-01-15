@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Batch Import | Elite Academia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-[#f8fafc] flex h-screen overflow-hidden">
+
+    <aside class="w-20 lg:w-24 bg-[#0f172a] text-white flex flex-col items-center py-8 shadow-2xl">
+        <div class="mb-12 w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <i class="fa fa-crown text-xl"></i>
+        </div>
+        <nav class="flex-1 flex flex-col gap-12">
+            <a href="{{ url_for('dashboard') }}" class="text-slate-500 hover:text-white text-xl transition-all"><i class="fa fa-th-large"></i></a>
+            <a href="{{ url_for('add_student') }}" class="text-slate-500 hover:text-white text-xl transition-all"><i class="fa fa-user-plus"></i></a>
+            <a href="{{ url_for('upload_students') }}" class="text-blue-400 text-xl"><i class="fa fa-file-arrow-up"></i></a>
+        </nav>
+        <a href="{{ url_for('logout') }}" class="mt-auto text-rose-500 transition-all"><i class="fa fa-power-off"></i></a>
+    </aside>
+
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white border-b py-6 px-12 flex justify-between items-center shadow-sm">
+            <div>
+                <h1 class="text-2xl font-black tracking-tighter text-slate-900 uppercase">ELITE <span class="text-blue-600">ACADEMIA</span></h1>
+                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.5em] mt-1">Data Management Module</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="text-right"><p class="text-[10px] font-black text-blue-600 uppercase tracking-tighter italic">Welcome Admin</p></div>
+                <div class="p-0.5 bg-gradient-to-tr from-blue-600 to-indigo-400 rounded-xl shadow-md">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=fff&color=0284c7&bold=true" class="w-12 h-12 rounded-lg border-2 border-white">
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 flex items-center justify-center p-12">
+            <div class="w-full max-w-3xl bg-white rounded-[3.5rem] shadow-2xl border border-slate-100 p-16 text-center">
+                <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner">
+                    <i class="fa fa-cloud-arrow-up text-3xl"></i>
+                </div>
+                
+                <h2 class="text-3xl font-[900] text-slate-900 uppercase tracking-tighter mb-4">Batch Import to Directory</h2>
+                <p class="text-[11px] font-[700] text-slate-400 uppercase tracking-[0.2em] mb-12">Select your data file to begin synchronization</p>
+
+                <form action="{{ url_for('upload_students') }}" method="POST" enctype="multipart/form-data" class="space-y-12">
+                    <div class="group relative border-2 border-dashed border-slate-200 rounded-[3rem] p-20 hover:border-blue-500 hover:bg-blue-50/30 transition-all cursor-pointer">
+                        <input type="file" name="file" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div class="space-y-6">
+                            <i class="fa fa-file-excel text-6xl text-slate-200 group-hover:text-blue-500 transition-all"></i>
+                            <p class="text-lg font-[800] text-slate-600 group-hover:text-blue-700">Click to upload or drag & drop</p>
+                            <div class="flex justify-center gap-4">
+                                <span class="bg-white px-4 py-1.5 rounded-lg border text-[10px] font-black text-slate-400 uppercase tracking-widest shadow-sm">.csv</span>
+                                <span class="bg-white px-4 py-1.5 rounded-lg border text-[10px] font-black text-slate-400 uppercase tracking-widest shadow-sm">.xlsx</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-8 pt-4">
+                        <a href="{{ url_for('dashboard') }}" class="flex-1 bg-slate-100 text-slate-500 py-6 rounded-[1.8rem] font-black text-xs uppercase tracking-[0.25em] text-center">Cancel</a>
+                        <button type="submit" class="flex-[2] bg-blue-600 text-white py-6 rounded-[1.8rem] font-black text-xs uppercase tracking-[0.25em] shadow-2xl shadow-blue-500/40 hover:bg-blue-700 transition-all">Process Import</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
